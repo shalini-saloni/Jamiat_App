@@ -1,42 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MONEY_ALLOCATION = [
   { label: 'Food & Clean Water', percent: 60, icon: 'restaurant', color: '#1B8A4C' },
-  { label: 'Medical Supplies', percent: 25, icon: 'medical', color: '#2196F3' },
-  { label: 'Temporary Shelter', percent: 15, icon: 'home', color: '#FF9800' },
+  { label: 'Medical Supplies',   percent: 25, icon: 'medical',    color: '#2196F3' },
+  { label: 'Temporary Shelter',  percent: 15, icon: 'home',       color: '#FF9800' },
 ];
 
 const LIVE_UPDATES = [
   { time: '2 HOURS AGO', text: 'Truckload of essential medicine and surgical kits arrived at Relief Camp A in Nagaon district.', emoji: '🏥' },
   { time: '6 HOURS AGO', text: '500 hot meals distributed to displaced families in Sector 4. Our mobile kitchen is moving to Sector 5 next.', emoji: '🍲' },
-  { time: '1 DAY AGO', text: '3 new temporary shelters constructed using tarpaulin and bamboo provided by donors.', emoji: '⛺' },
+  { time: '1 DAY AGO',   text: '3 new temporary shelters constructed using tarpaulin and bamboo provided by donors.', emoji: '⛺' },
 ];
 
 const STATS = [
-  { num: '5,000+', label: 'Meals', icon: 'restaurant' },
-  { num: '1,200', label: 'Medical', icon: 'medical' },
-  { num: '350', label: 'Shelters', icon: 'home' },
+  { num: '5,000+', label: 'Meals',    icon: 'restaurant' },
+  { num: '1,200',  label: 'Medical',  icon: 'medical' },
+  { num: '350',    label: 'Shelters', icon: 'home' },
 ];
 
 export default function CampaignScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const [expanded, setExpanded] = useState(false);
-
-  const campaign = route?.params?.campaign || {
-    title: 'Emergency Flood Relief - Assam 2024', tag: 'URGENT', color: '#1B6B3A', emoji: '🌊', raised: 45000, goal: 100000, percent: 45,
-  };
-
-  const raised = campaign.raised || 45000;
-  const goal = campaign.goal || 100000;
+  const campaign = route?.params?.campaign || {};
+  const raised  = campaign.raised  || 45000;
+  const goal    = campaign.goal    || 100000;
   const percent = campaign.percent || 45;
 
-  const aboutText = campaign.fullDesc || `Assam is currently facing one of its worst flood crises in recent years. Thousands of families have lost their homes and are struggling for basic necessities like food, clean water, and medicine. Jamiat Ulema-i-Hind has deployed teams across 12 affected districts to provide immediate relief. Your contribution helps us reach the most remote areas and ensure no family is left behind.`;
+  const aboutText = `${campaign.title || 'This campaign'} is one of Jamiat's most urgent initiatives. Thousands of families have lost their homes and are struggling for basic necessities like food, clean water, and medicine. Jamiat Ulema-i-Hind has deployed teams across 12 affected districts to provide immediate relief. Your contribution helps us reach the most remote areas and ensure no family is left behind.`;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
           <Ionicons name="arrow-back" size={22} color="#333" />
@@ -48,17 +45,21 @@ export default function CampaignScreen({ navigation, route }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero */}
-        <View style={[styles.heroImage, { backgroundColor: campaign.color || '#1B6B3A' }]}>
-          <Text style={styles.heroEmoji}>{campaign.emoji || '🌊'}</Text>
-          <View style={[styles.urgentBadge, { backgroundColor: campaign.tagColor || '#FF4444' }]}>
-            <Text style={styles.urgentText}>{campaign.tag || 'URGENT'}</Text>
+        {/* Hero Image */}
+        {campaign.image ? (
+          <Image source={campaign.image} style={styles.heroImage} />
+        ) : (
+          <View style={[styles.heroFallback, { backgroundColor: campaign.color || '#1B6B3A' }]}>
+            <Text style={{ fontSize: 70 }}>{campaign.emoji || '🌊'}</Text>
           </View>
+        )}
+        <View style={[styles.urgentBadge, { backgroundColor: campaign.tagColor || '#FF4444' }]}>
+          <Text style={styles.urgentText}>{campaign.tag || 'URGENT'}</Text>
         </View>
 
-        {/* Info */}
+        {/* Info Card */}
         <View style={styles.infoCard}>
-          <Text style={styles.campaignTitle}>{campaign.title}</Text>
+          <Text style={styles.campaignTitle}>{campaign.title || 'Emergency Relief Campaign'}</Text>
           <Text style={styles.amountRaised}>₹{(raised / 1000).toFixed(0)},000</Text>
           <View style={styles.progressMeta}>
             <Text style={styles.goalText}>raised of ₹{(goal / 1000).toFixed(0)},000 goal</Text>
@@ -73,7 +74,7 @@ export default function CampaignScreen({ navigation, route }) {
         {/* Stats */}
         <View style={styles.statsRow}>
           {STATS.map((s, i) => (
-            <View key={i} style={styles.statItem}>
+            <View key={i} style={[styles.statItem, i < STATS.length - 1 && styles.statBorder]}>
               <View style={styles.statIcon}><Ionicons name={s.icon} size={18} color="#1B8A4C" /></View>
               <Text style={styles.statNum}>{s.num}</Text>
               <Text style={styles.statLabel}>{s.label}</Text>
@@ -131,6 +132,7 @@ export default function CampaignScreen({ navigation, route }) {
         <View style={{ height: 100 }} />
       </ScrollView>
 
+      {/* Donate Footer */}
       <View style={[styles.donateFooter, { paddingBottom: insets.bottom + 12 }]}>
         <TouchableOpacity style={styles.donateBtn} onPress={() => navigation.navigate('Donation', { campaign })}>
           <Text style={styles.donateBtnText}>Donate Now ♥</Text>
@@ -145,9 +147,9 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   headerBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
-  heroImage: { height: 200, alignItems: 'center', justifyContent: 'center' },
-  heroEmoji: { fontSize: 72 },
-  urgentBadge: { position: 'absolute', top: 14, left: 14, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  heroImage: { width: '100%', height: 220, resizeMode: 'cover' },
+  heroFallback: { height: 220, alignItems: 'center', justifyContent: 'center' },
+  urgentBadge: { position: 'absolute', top: 70, left: 14, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
   urgentText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
   infoCard: { backgroundColor: '#fff', marginHorizontal: 16, marginTop: 16, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
   campaignTitle: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 10, lineHeight: 24 },
@@ -160,22 +162,23 @@ const styles = StyleSheet.create({
   donorCount: { fontSize: 11, color: '#999' },
   statsRow: { flexDirection: 'row', marginHorizontal: 16, marginTop: 12, backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 },
   statItem: { flex: 1, alignItems: 'center' },
-  statIcon: { width: 38, height: 38, borderRadius: 10, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  statBorder: { borderRightWidth: 1, borderRightColor: '#EEE' },
+  statIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   statNum: { fontSize: 15, fontWeight: '800', color: '#1A1A1A', marginBottom: 2 },
   statLabel: { fontSize: 10, color: '#999' },
   section: { backgroundColor: '#fff', marginHorizontal: 16, marginTop: 12, borderRadius: 14, padding: 16, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A', marginBottom: 12 },
   aboutText: { fontSize: 13, color: '#555', lineHeight: 20 },
   readMoreBtn: { color: '#1B8A4C', fontWeight: '700', fontSize: 13, marginTop: 8 },
-  allocationItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  allocationLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  allocationItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  allocationLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: 10 },
   allocationIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   allocationLabel: { fontSize: 13, color: '#333', fontWeight: '500' },
   allocationRight: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' },
   allocationBarBg: { width: 90, height: 6, backgroundColor: '#F0F0F0', borderRadius: 3 },
   allocationBarFill: { height: 6, borderRadius: 3 },
-  allocationPct: { fontSize: 12, fontWeight: '700', color: '#555', width: 30, textAlign: 'right' },
-  liveHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 0 },
+  allocationPct: { fontSize: 12, fontWeight: '700', color: '#555', width: 32, textAlign: 'right' },
+  liveHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF4444' },
   updateItem: { flexDirection: 'row', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
   updateEmoji: { width: 44, height: 44, borderRadius: 10, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },

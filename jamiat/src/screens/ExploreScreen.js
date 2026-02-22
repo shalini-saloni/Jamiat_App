@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CAMPAIGNS } from './HomeScreen';
@@ -8,7 +8,7 @@ const CATEGORIES = ['All', 'Relief', 'Education', 'Health', 'Zakat', 'Food'];
 
 export default function ExploreScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
-  const [search, setSearch] = useState(route?.params?.searchQuery || '');
+  const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
@@ -18,9 +18,8 @@ export default function ExploreScreen({ navigation, route }) {
   }, [route?.params?.searchQuery]);
 
   const filtered = CAMPAIGNS.filter(c => {
-    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
-      c.desc.toLowerCase().includes(search.toLowerCase()) ||
-      c.tag.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchesSearch = !q || c.title.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q);
     const matchesCategory = activeCategory === 'All' || c.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -31,36 +30,40 @@ export default function ExploreScreen({ navigation, route }) {
         <Text style={styles.headerTitle}>Explore Campaigns</Text>
       </View>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search" size={16} color="#999" style={{ marginRight: 8 }} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search campaigns..."
-          placeholderTextColor="#999"
-          value={search}
-          onChangeText={setSearch}
-          returnKeyType="search"
-        />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch('')}>
-            <Ionicons name="close-circle" size={16} color="#bbb" />
-          </TouchableOpacity>
-        )}
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={16} color="#999" style={{ marginRight: 8 }} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search campaigns..."
+            placeholderTextColor="#aaa"
+            value={search}
+            onChangeText={setSearch}
+            returnKeyType="search"
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Ionicons name="close-circle" size={16} color="#bbb" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
-        contentContainerStyle={styles.categories}
+        style={styles.catScroll}
+        contentContainerStyle={styles.catContainer}
       >
-        {CATEGORIES.map((c) => (
+        {CATEGORIES.map((cat) => (
           <TouchableOpacity
-            key={c}
-            style={[styles.catBtn, activeCategory === c && styles.catBtnActive]}
-            onPress={() => setActiveCategory(c)}
+            key={cat}
+            onPress={() => setActiveCategory(cat)}
+            style={[styles.catPill, activeCategory === cat && styles.catPillActive]}
           >
-            <Text style={[styles.catText, activeCategory === c && styles.catTextActive]}>{c}</Text>
+            <Text style={[styles.catPillText, activeCategory === cat && styles.catPillTextActive]}>
+              {cat}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -69,9 +72,9 @@ export default function ExploreScreen({ navigation, route }) {
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>🔍</Text>
           <Text style={styles.emptyTitle}>No campaigns found</Text>
-          <Text style={styles.emptyDesc}>Try a different search or category</Text>
-          <TouchableOpacity onPress={() => { setSearch(''); setActiveCategory('All'); }}>
-            <Text style={styles.clearBtn}>Clear filters</Text>
+          <Text style={styles.emptyDesc}>Try a different search term or category</Text>
+          <TouchableOpacity onPress={() => { setSearch(''); setActiveCategory('All'); }} style={styles.clearBtn}>
+            <Text style={styles.clearBtnText}>Clear filters</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -79,15 +82,15 @@ export default function ExploreScreen({ navigation, route }) {
           <Text style={styles.resultCount}>{filtered.length} campaign{filtered.length !== 1 ? 's' : ''} found</Text>
           {filtered.map((c) => (
             <TouchableOpacity key={c.id} style={styles.card} onPress={() => navigation.navigate('Campaign', { campaign: c })}>
-              <View style={[styles.cardImage, { backgroundColor: c.color }]}>
-                <Text style={{ fontSize: 48 }}>{c.emoji}</Text>
+              <View style={styles.cardImageBox}>
+                <Image source={c.image} style={styles.cardImage} />
                 <View style={[styles.tagBadge, { backgroundColor: c.tagColor }]}>
                   <Text style={styles.tagText}>{c.tag}</Text>
                 </View>
               </View>
               <View style={styles.cardBody}>
                 <Text style={styles.cardTitle}>{c.title}</Text>
-                <Text style={styles.cardDesc}>{c.desc}</Text>
+                <Text style={styles.cardDesc} numberOfLines={2}>{c.desc}</Text>
                 <View style={styles.progressBg}>
                   <View style={[styles.progressFill, { width: `${c.percent}%` }]} />
                 </View>
@@ -115,20 +118,55 @@ export default function ExploreScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: { paddingHorizontal: 16, paddingVertical: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  header: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
   headerTitle: { fontSize: 20, fontWeight: '800', color: '#1A1A1A' },
-  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: 12, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  searchWrapper: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4, backgroundColor: '#fff' },
+  searchBox: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5',
+    borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
+    borderWidth: 1, borderColor: '#EBEBEB',
+  },
   searchInput: { flex: 1, fontSize: 14, color: '#333' },
-  categoriesScroll: { maxHeight: 54, marginTop: 10 },
-  categories: { paddingHorizontal: 16, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  catBtn: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#E0E0E0' },
-  catBtnActive: { backgroundColor: '#1B8A4C', borderColor: '#1B8A4C' },
-  catText: { fontSize: 13, color: '#555', fontWeight: '600' },
-  catTextActive: { color: '#fff', fontWeight: '700' },
-  list: { paddingHorizontal: 16, paddingTop: 8 },
+  catScroll: { maxHeight: 52, backgroundColor: '#fff' },
+  catContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  catPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: '#F0F0F0',
+    borderWidth: 0,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  catPillActive: {
+    backgroundColor: '#1B8A4C',
+  },
+  catPillText: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: '600',
+  },
+  catPillTextActive: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  list: { paddingHorizontal: 16, paddingTop: 12 },
   resultCount: { fontSize: 12, color: '#999', marginBottom: 10 },
   card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 6, elevation: 3 },
-  cardImage: { height: 160, alignItems: 'center', justifyContent: 'center' },
+  cardImageBox: { width: '100%', height: 170, position: 'relative' },
+  cardImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   tagBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
   tagText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
   cardBody: { padding: 14 },
@@ -139,13 +177,14 @@ const styles = StyleSheet.create({
   cardStats: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   raisedAmount: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
   goalText: { fontSize: 11, color: '#999', marginTop: 1 },
-  percentBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
-  percentText: { fontSize: 13, color: '#1B8A4C', fontWeight: '800' },
+  percentBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 },
+  percentText: { fontSize: 14, color: '#1B8A4C', fontWeight: '800' },
   donateBtn: { backgroundColor: '#1B8A4C', paddingVertical: 13, borderRadius: 11, alignItems: 'center' },
   donateBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyEmoji: { fontSize: 48, marginBottom: 12 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 6 },
-  emptyDesc: { fontSize: 13, color: '#999', marginBottom: 16 },
-  clearBtn: { color: '#1B8A4C', fontWeight: '700', fontSize: 14 },
+  emptyDesc: { fontSize: 13, color: '#999', marginBottom: 20, textAlign: 'center' },
+  clearBtn: { backgroundColor: '#1B8A4C', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 },
+  clearBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 });
