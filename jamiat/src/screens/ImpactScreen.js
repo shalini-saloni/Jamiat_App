@@ -100,6 +100,29 @@ export default function ImpactScreen({ navigation }) {
           </View>
         )}
 
+        {/* Impact Timeline */}
+        {totalImpact > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Impact Timeline</Text>
+              <TouchableOpacity><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+            </View>
+            {TIMELINE.map((t, i) => (
+              <View key={i} style={styles.timelineItem}>
+                <View style={styles.timelineLeft}>
+                  <View style={styles.timelineDot} />
+                  {i < TIMELINE.length - 1 && <View style={styles.timelineLine} />}
+                </View>
+                <View style={styles.timelineContent}>
+                  <Text style={styles.timelineDate}>{t.date}</Text>
+                  <Text style={styles.timelineTitle}>{t.title}</Text>
+                  <Text style={styles.timelineDesc}>{t.desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Donation History */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -130,28 +153,7 @@ export default function ImpactScreen({ navigation }) {
           )}
         </View>
 
-        {/* Impact Timeline */}
-        {totalImpact > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Impact Timeline</Text>
-              <TouchableOpacity><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
-            </View>
-            {TIMELINE.map((t, i) => (
-              <View key={i} style={styles.timelineItem}>
-                <View style={styles.timelineLeft}>
-                  <View style={styles.timelineDot} />
-                  {i < TIMELINE.length - 1 && <View style={styles.timelineLine} />}
-                </View>
-                <View style={styles.timelineContent}>
-                  <Text style={styles.timelineDate}>{t.date}</Text>
-                  <Text style={styles.timelineTitle}>{t.title}</Text>
-                  <Text style={styles.timelineDesc}>{t.desc}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
+        
 
         {/* Settings */}
         <View style={styles.section}>

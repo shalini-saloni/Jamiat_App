@@ -7,11 +7,8 @@ import { View, Text } from 'react-native';
 
 import { useApp } from '../context/AppContext';
 
-// Auth screens
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
-
-// Main screens
 import HomeScreen from '../screens/HomeScreen';
 import ExploreScreen from '../screens/ExploreScreen';
 import ImpactScreen from '../screens/ImpactScreen';
@@ -24,37 +21,49 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const TAB_CONFIG = {
+  Home:     { active: 'home',       inactive: 'home-outline',      label: 'Home' },
+  Explore:  { active: 'compass',    inactive: 'compass-outline',   label: 'Explore' },
+  Donate:   { active: 'heart',      inactive: 'heart-outline',     label: 'Donate' },
+  MyImpact: { active: 'bar-chart',  inactive: 'bar-chart-outline', label: 'My Impact' },
+};
+
 function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#1B8A4C',
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: '#AAAAAA',
         tabBarStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: '#ffffff',
           borderTopWidth: 1,
-          borderTopColor: '#F0F0F0',
-          height: 60,
+          borderTopColor: '#EEEEEE',
+          height: 62,
           paddingBottom: 8,
           paddingTop: 6,
+          elevation: 10,
+          shadowColor: '#000',
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
+        },
         tabBarIcon: ({ focused, color }) => {
-          const icons = {
-            Home: focused ? 'home' : 'home-outline',
-            Explore: focused ? 'compass' : 'compass-outline',
-            Donate: focused ? 'heart' : 'heart-outline',
-            MyImpact: focused ? 'bar-chart' : 'bar-chart-outline',
-          };
-          return <Ionicons name={icons[route.name] || 'ellipse'} size={22} color={color} />;
+          const cfg = TAB_CONFIG[route.name];
+          const iconName = focused ? cfg.active : cfg.inactive;
+          return <Ionicons name={iconName} size={23} color={color} />;
         },
+        tabBarLabel: TAB_CONFIG[route.name]?.label || route.name,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
-      <Tab.Screen name="Explore" component={ExploreScreen} options={{ tabBarLabel: 'Explore' }} />
-      <Tab.Screen name="Donate" component={DonationScreen} options={{ tabBarLabel: 'Donate' }} />
-      <Tab.Screen name="MyImpact" component={ImpactScreen} options={{ tabBarLabel: 'My Impact' }} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Explore" component={ExploreScreen} />
+      <Tab.Screen name="Donate" component={DonationScreen} />
+      <Tab.Screen name="MyImpact" component={ImpactScreen} />
     </Tab.Navigator>
   );
 }
@@ -84,7 +93,6 @@ function MainStack() {
 
 export default function AppNavigator() {
   const { user } = useApp();
-
   return (
     <NavigationContainer>
       {user ? <MainStack /> : <AuthStack />}
