@@ -44,7 +44,6 @@ export default function DonationScreen({ navigation, route }) {
     setProcessing(true);
     setTimeout(() => {
       setProcessing(false);
-      // Add to dashboard
       addDonation({
         name: campaign ? campaign.title : `${selectedType} Donation`,
         amount: currentAmount,

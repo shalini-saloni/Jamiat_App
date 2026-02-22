@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const ALL_CAMPAIGNS = [
-  { id: 1, tag: 'URGENT', tagColor: '#FF4444', title: 'Assam Flood Relief', desc: 'Providing flood, clean water, and shelter', raised: 31000, goal: 50000, percent: 62, color: '#1B6B3A', emoji: '🌊', category: 'Relief' },
-  { id: 2, tag: 'EDUCATION', tagColor: '#F5A623', title: 'Education for All', desc: 'Sponsoring quality education for children', raised: 18000, goal: 30000, percent: 60, color: '#2E7D32', emoji: '📚', category: 'Education' },
-  { id: 3, tag: 'HEALTH', tagColor: '#9C27B0', title: 'Medical Aid Gaza', desc: 'Urgent medical support for families', raised: 55000, goal: 80000, percent: 69, color: '#4A148C', emoji: '🏥', category: 'Health' },
-  { id: 4, tag: 'WATER', tagColor: '#2196F3', title: 'Clean Water Yemen', desc: 'Providing safe drinking water', raised: 22000, goal: 40000, percent: 55, color: '#0D47A1', emoji: '💧', category: 'Relief' },
-  { id: 5, tag: 'ZAKAT', tagColor: '#1B8A4C', title: 'Zakat Distribution', desc: 'Annual Zakat for poor families', raised: 120000, goal: 200000, percent: 60, color: '#1B5E20', emoji: '🤲', category: 'Zakat' },
-  { id: 6, tag: 'FOOD', tagColor: '#FF5722', title: 'Ramadan Food Pack', desc: 'Food baskets for families this Ramadan', raised: 38000, goal: 60000, percent: 63, color: '#BF360C', emoji: '🌙', category: 'Food' },
-];
+import { CAMPAIGNS } from './HomeScreen';
 
 const CATEGORIES = ['All', 'Relief', 'Education', 'Health', 'Zakat', 'Food'];
 
-export default function ExploreScreen({ navigation }) {
+export default function ExploreScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(route?.params?.searchQuery || '');
   const [activeCategory, setActiveCategory] = useState('All');
 
-  const filtered = ALL_CAMPAIGNS.filter(c => {
-    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase());
+  useEffect(() => {
+    if (route?.params?.searchQuery) {
+      setSearch(route.params.searchQuery);
+    }
+  }, [route?.params?.searchQuery]);
+
+  const filtered = CAMPAIGNS.filter(c => {
+    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
+      c.desc.toLowerCase().includes(search.toLowerCase()) ||
+      c.tag.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === 'All' || c.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -39,10 +39,21 @@ export default function ExploreScreen({ navigation }) {
           placeholderTextColor="#999"
           value={search}
           onChangeText={setSearch}
+          returnKeyType="search"
         />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Ionicons name="close-circle" size={16} color="#bbb" />
+          </TouchableOpacity>
+        )}
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoriesScroll}
+        contentContainerStyle={styles.categories}
+      >
         {CATEGORIES.map((c) => (
           <TouchableOpacity
             key={c}
@@ -54,40 +65,50 @@ export default function ExploreScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
-        {filtered.map((c) => (
-          <TouchableOpacity
-            key={c.id}
-            style={styles.card}
-            onPress={() => navigation.navigate('Campaign', { campaign: c })}
-          >
-            <View style={[styles.cardImage, { backgroundColor: c.color }]}>
-              <Text style={{ fontSize: 44 }}>{c.emoji}</Text>
-              <View style={[styles.tagBadge, { backgroundColor: c.tagColor }]}>
-                <Text style={styles.tagText}>{c.tag}</Text>
-              </View>
-            </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.cardTitle}>{c.title}</Text>
-              <Text style={styles.cardDesc}>{c.desc}</Text>
-              <View style={styles.progressBg}>
-                <View style={[styles.progressFill, { width: `${c.percent}%` }]} />
-              </View>
-              <View style={styles.cardFooter}>
-                <Text style={styles.raisedText}>₹{(c.raised / 1000).toFixed(0)}k raised</Text>
-                <Text style={styles.percentText}>{c.percent}%</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.donateBtn}
-                onPress={() => navigation.navigate('Donation', { type: 'Sadaqa' })}
-              >
-                <Text style={styles.donateBtnText}>Donate Now</Text>
-              </TouchableOpacity>
-            </View>
+      {filtered.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>🔍</Text>
+          <Text style={styles.emptyTitle}>No campaigns found</Text>
+          <Text style={styles.emptyDesc}>Try a different search or category</Text>
+          <TouchableOpacity onPress={() => { setSearch(''); setActiveCategory('All'); }}>
+            <Text style={styles.clearBtn}>Clear filters</Text>
           </TouchableOpacity>
-        ))}
-        <View style={{ height: 80 }} />
-      </ScrollView>
+        </View>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
+          <Text style={styles.resultCount}>{filtered.length} campaign{filtered.length !== 1 ? 's' : ''} found</Text>
+          {filtered.map((c) => (
+            <TouchableOpacity key={c.id} style={styles.card} onPress={() => navigation.navigate('Campaign', { campaign: c })}>
+              <View style={[styles.cardImage, { backgroundColor: c.color }]}>
+                <Text style={{ fontSize: 48 }}>{c.emoji}</Text>
+                <View style={[styles.tagBadge, { backgroundColor: c.tagColor }]}>
+                  <Text style={styles.tagText}>{c.tag}</Text>
+                </View>
+              </View>
+              <View style={styles.cardBody}>
+                <Text style={styles.cardTitle}>{c.title}</Text>
+                <Text style={styles.cardDesc}>{c.desc}</Text>
+                <View style={styles.progressBg}>
+                  <View style={[styles.progressFill, { width: `${c.percent}%` }]} />
+                </View>
+                <View style={styles.cardStats}>
+                  <View>
+                    <Text style={styles.raisedAmount}>₹{(c.raised / 1000).toFixed(0)}k raised</Text>
+                    <Text style={styles.goalText}>of ₹{(c.goal / 1000).toFixed(0)}k goal</Text>
+                  </View>
+                  <View style={styles.percentBadge}>
+                    <Text style={styles.percentText}>{c.percent}%</Text>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.donateBtn} onPress={() => navigation.navigate('Donation', { campaign: c })}>
+                  <Text style={styles.donateBtnText}>Donate Now</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -98,24 +119,33 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 20, fontWeight: '800', color: '#1A1A1A' },
   searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 16, marginTop: 12, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   searchInput: { flex: 1, fontSize: 14, color: '#333' },
-  categories: { paddingHorizontal: 16, paddingVertical: 12, maxHeight: 56 },
-  catBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#fff', marginRight: 8, borderWidth: 1, borderColor: '#E0E0E0' },
+  categoriesScroll: { maxHeight: 54, marginTop: 10 },
+  categories: { paddingHorizontal: 16, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  catBtn: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#E0E0E0' },
   catBtnActive: { backgroundColor: '#1B8A4C', borderColor: '#1B8A4C' },
-  catText: { fontSize: 13, color: '#666', fontWeight: '500' },
+  catText: { fontSize: 13, color: '#555', fontWeight: '600' },
   catTextActive: { color: '#fff', fontWeight: '700' },
-  list: { paddingHorizontal: 16, paddingTop: 4 },
-  card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 6, elevation: 3 },
-  cardImage: { height: 150, alignItems: 'center', justifyContent: 'center' },
+  list: { paddingHorizontal: 16, paddingTop: 8 },
+  resultCount: { fontSize: 12, color: '#999', marginBottom: 10 },
+  card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 6, elevation: 3 },
+  cardImage: { height: 160, alignItems: 'center', justifyContent: 'center' },
   tagBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
-  tagText: { color: '#fff', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  tagText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
   cardBody: { padding: 14 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A', marginBottom: 4 },
-  cardDesc: { fontSize: 12, color: '#777', marginBottom: 10, lineHeight: 17 },
-  progressBg: { height: 6, backgroundColor: '#E8F5E9', borderRadius: 3, marginBottom: 8 },
-  progressFill: { height: 6, backgroundColor: '#1B8A4C', borderRadius: 3 },
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  raisedText: { fontSize: 12, color: '#555', fontWeight: '500' },
-  percentText: { fontSize: 12, color: '#1B8A4C', fontWeight: '700' },
-  donateBtn: { backgroundColor: '#1B8A4C', paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A', marginBottom: 5 },
+  cardDesc: { fontSize: 12, color: '#777', marginBottom: 12, lineHeight: 18 },
+  progressBg: { height: 7, backgroundColor: '#E8F5E9', borderRadius: 4, marginBottom: 10 },
+  progressFill: { height: 7, backgroundColor: '#1B8A4C', borderRadius: 4 },
+  cardStats: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  raisedAmount: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
+  goalText: { fontSize: 11, color: '#999', marginTop: 1 },
+  percentBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  percentText: { fontSize: 13, color: '#1B8A4C', fontWeight: '800' },
+  donateBtn: { backgroundColor: '#1B8A4C', paddingVertical: 13, borderRadius: 11, alignItems: 'center' },
   donateBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  emptyEmoji: { fontSize: 48, marginBottom: 12 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 6 },
+  emptyDesc: { fontSize: 13, color: '#999', marginBottom: 16 },
+  clearBtn: { color: '#1B8A4C', fontWeight: '700', fontSize: 14 },
 });
