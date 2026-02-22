@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text } from 'react-native';
 
 import { useApp } from '../context/AppContext';
 
@@ -17,16 +16,10 @@ import CampaignScreen from '../screens/CampaignScreen';
 import StoryScreen from '../screens/StoryScreen';
 import StoriesScreen from '../screens/StoriesScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-const TAB_CONFIG = {
-  Home:     { active: 'home',       inactive: 'home-outline',      label: 'Home' },
-  Explore:  { active: 'compass',    inactive: 'compass-outline',   label: 'Explore' },
-  Donate:   { active: 'heart',      inactive: 'heart-outline',     label: 'Donate' },
-  MyImpact: { active: 'bar-chart',  inactive: 'bar-chart-outline', label: 'My Impact' },
-};
 
 function TabNavigator() {
   return (
@@ -39,10 +32,10 @@ function TabNavigator() {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#EEEEEE',
-          height: 62,
+          height: 60,
           paddingBottom: 8,
           paddingTop: 6,
-          elevation: 10,
+          elevation: 12,
           shadowColor: '#000',
           shadowOpacity: 0.08,
           shadowRadius: 8,
@@ -50,20 +43,22 @@ function TabNavigator() {
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
-          marginTop: 2,
         },
         tabBarIcon: ({ focused, color }) => {
-          const cfg = TAB_CONFIG[route.name];
-          const iconName = focused ? cfg.active : cfg.inactive;
-          return <Ionicons name={iconName} size={23} color={color} />;
+          const icons = {
+            Home:     focused ? 'home'       : 'home-outline',
+            Explore:  focused ? 'compass'    : 'compass-outline',
+            MyImpact: focused ? 'bar-chart'  : 'bar-chart-outline',
+            Profile:  focused ? 'person'     : 'person-outline',
+          };
+          return <Ionicons name={icons[route.name] || 'ellipse'} size={22} color={color} />;
         },
-        tabBarLabel: TAB_CONFIG[route.name]?.label || route.name,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Explore" component={ExploreScreen} />
-      <Tab.Screen name="Donate" component={DonationScreen} />
-      <Tab.Screen name="MyImpact" component={ImpactScreen} />
+      <Tab.Screen name="Home"     component={HomeScreen}    options={{ tabBarLabel: 'Home' }} />
+      <Tab.Screen name="Explore"  component={ExploreScreen} options={{ tabBarLabel: 'Explore' }} />
+      <Tab.Screen name="MyImpact" component={ImpactScreen}  options={{ tabBarLabel: 'My Impact' }} />
+      <Tab.Screen name="Profile"  component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );
 }
@@ -71,7 +66,7 @@ function TabNavigator() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Login"  component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
     </Stack.Navigator>
   );
@@ -80,12 +75,12 @@ function AuthStack() {
 function MainStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Tabs" component={TabNavigator} />
-      <Stack.Screen name="Campaign" component={CampaignScreen} />
-      <Stack.Screen name="Donation" component={DonationScreen} />
-      <Stack.Screen name="MyImpact" component={ImpactScreen} />
-      <Stack.Screen name="Story" component={StoryScreen} />
-      <Stack.Screen name="Stories" component={StoriesScreen} />
+      <Stack.Screen name="Tabs"        component={TabNavigator} />
+      <Stack.Screen name="Campaign"    component={CampaignScreen} />
+      <Stack.Screen name="Donation"    component={DonationScreen} />
+      <Stack.Screen name="MyImpact"    component={ImpactScreen} />
+      <Stack.Screen name="Story"       component={StoryScreen} />
+      <Stack.Screen name="Stories"     component={StoriesScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>
   );
