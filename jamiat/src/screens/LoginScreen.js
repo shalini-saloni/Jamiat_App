@@ -28,7 +28,6 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // Simulate login - in real app would call API
       const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       login({
         name,
@@ -38,24 +37,23 @@ export default function LoginScreen({ navigation }) {
         phone: '',
         address: '',
       });
-    }, 1000);
+    }, 900);
   };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <LinearGradient colors={['#1B8A4C', '#0D5C30']} style={[styles.topBg, { paddingTop: insets.top + 20 }]}>
-        <View style={styles.logoArea}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>J</Text>
-          </View>
-          <Text style={styles.appName}>Jamiat</Text>
-          <Text style={styles.tagline}>Give with purpose, impact with love</Text>
+
+      <LinearGradient colors={['#1B8A4C', '#0D5C30']} style={[styles.topSection, { paddingTop: insets.top + 24 }]}>
+        <View style={styles.logoCircle}>
+          <Text style={styles.logoLetter}>J</Text>
         </View>
+        <Text style={styles.appName}>Jamiat</Text>
+        <Text style={styles.tagline}>Give with purpose, impact with love</Text>
       </LinearGradient>
 
-      <ScrollView style={styles.form} contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.formSection} contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
+        <Text style={styles.subtitle}>Sign in to continue your journey of giving</Text>
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email Address</Text>
@@ -86,7 +84,7 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setPassword}
             />
             <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-              <Ionicons name={showPass ? 'eye-off-outline' : 'eye-outline'} size={18} color="#999" />
+              <Ionicons name={showPass ? 'eye-off-outline' : 'eye-outline'} size={18} color="#aaa" />
             </TouchableOpacity>
           </View>
         </View>
@@ -95,7 +93,11 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.loginBtn, loading && styles.loginBtnDisabled]} onPress={handleLogin} disabled={loading}>
+        <TouchableOpacity
+          style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
           <Text style={styles.loginBtnText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
         </TouchableOpacity>
 
@@ -116,28 +118,27 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  topBg: { paddingBottom: 30 },
-  logoArea: { alignItems: 'center', paddingBottom: 10 },
-  logoCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center', marginBottom: 10, borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)' },
-  logoText: { color: '#fff', fontSize: 36, fontWeight: '800' },
-  appName: { color: '#fff', fontSize: 28, fontWeight: '800', marginBottom: 4 },
-  tagline: { color: 'rgba(255,255,255,0.75)', fontSize: 13 },
-  form: { flex: 1, backgroundColor: '#fff' },
+  topSection: { paddingHorizontal: 24, paddingBottom: 32, alignItems: 'center' },
+  logoCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center', marginBottom: 12, borderWidth: 2, borderColor: 'rgba(255,255,255,0.35)' },
+  logoLetter: { color: '#fff', fontSize: 36, fontWeight: '800' },
+  appName: { color: '#fff', fontSize: 30, fontWeight: '800', marginBottom: 4 },
+  tagline: { color: 'rgba(255,255,255,0.75)', fontSize: 13, textAlign: 'center' },
+  formSection: { flex: 1, backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: '800', color: '#1A1A1A', marginBottom: 4, marginTop: 4 },
-  subtitle: { fontSize: 14, color: '#888', marginBottom: 24 },
+  subtitle: { fontSize: 13, color: '#888', marginBottom: 24, lineHeight: 18 },
   inputGroup: { marginBottom: 16 },
   label: { fontSize: 13, fontWeight: '600', color: '#444', marginBottom: 7 },
-  inputBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E8E8E8', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: '#FAFAFA' },
+  inputBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E8E8E8', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 13, backgroundColor: '#FAFAFA' },
   inputIcon: { marginRight: 10 },
   input: { flex: 1, fontSize: 15, color: '#222' },
-  forgotBtn: { alignSelf: 'flex-end', marginBottom: 20 },
+  forgotBtn: { alignSelf: 'flex-end', marginBottom: 22 },
   forgotText: { color: '#1B8A4C', fontSize: 13, fontWeight: '600' },
   loginBtn: { backgroundColor: '#1B8A4C', paddingVertical: 15, borderRadius: 13, alignItems: 'center', shadowColor: '#1B8A4C', shadowOpacity: 0.35, shadowRadius: 8, elevation: 4 },
   loginBtnDisabled: { opacity: 0.7 },
   loginBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#EEE' },
-  dividerText: { marginHorizontal: 12, color: '#aaa', fontSize: 13 },
+  dividerText: { marginHorizontal: 14, color: '#aaa', fontSize: 13 },
   signupBtn: { borderWidth: 2, borderColor: '#1B8A4C', paddingVertical: 14, borderRadius: 13, alignItems: 'center' },
   signupBtnText: { color: '#1B8A4C', fontSize: 16, fontWeight: '700' },
   terms: { textAlign: 'center', color: '#bbb', fontSize: 11, marginTop: 20, lineHeight: 16 },
