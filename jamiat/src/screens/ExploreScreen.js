@@ -9,15 +9,22 @@ import { CAMPAIGNS } from './HomeScreen';
 
 const CATEGORIES = ['All', 'Food', 'Water', 'Health', 'Education', 'Zakat'];
 
+const LOCATION_MAP = {
+  1: 'Assam, India',
+  2: 'Rural India',
+  3: 'Gaza Region',
+  4: 'Rural Mewat',
+  5: 'Pan India',
+  6: 'Pan India',
+};
+
 export default function ExploreScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
-    if (route?.params?.searchQuery) {
-      setSearch(route.params.searchQuery);
-    }
+    if (route?.params?.searchQuery) setSearch(route.params.searchQuery);
   }, [route?.params?.searchQuery]);
 
   const filtered = CAMPAIGNS.filter((c) => {
@@ -25,26 +32,23 @@ export default function ExploreScreen({ navigation, route }) {
     const matchSearch = !q
       || c.title.toLowerCase().includes(q)
       || c.desc.toLowerCase().includes(q)
-      || c.tag.toLowerCase().includes(q);
+      || c.tag.toLowerCase().includes(q)
+      || c.category.toLowerCase().includes(q);
     const matchCat = activeCategory === 'All' || c.category === activeCategory;
     return matchSearch && matchCat;
   });
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F5F5F5', paddingTop: insets.top }}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Projects</Text>
-      </View>
 
       {/* Search bar */}
       <View style={styles.searchWrap}>
         <View style={styles.searchBox}>
-          <Ionicons name="search" size={16} color="#999" style={{ marginRight: 8 }} />
+          <Ionicons name="search" size={16} color="#bbb" style={{ marginRight: 8 }} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search campaigns..."
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#bbb"
             value={search}
             onChangeText={setSearch}
             returnKeyType="search"
@@ -54,38 +58,31 @@ export default function ExploreScreen({ navigation, route }) {
               <Ionicons name="close-circle" size={16} color="#bbb" />
             </TouchableOpacity>
           )}
+          <TouchableOpacity style={{ marginLeft: 8 }}>
+            <Ionicons name="options-outline" size={18} color="#555" />
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Category pills - key fix: use inline backgroundColor directly on View */}
-      <View style={styles.catRow}>
+      {/* Category pills */}
+      <View style={styles.catWrap}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catContent}>
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
-              <TouchableOpacity
-                key={cat}
-                onPress={() => setActiveCategory(cat)}
-                activeOpacity={0.8}
-              >
-                <View
-                  style={{
-                    paddingHorizontal: 18,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 8,
-                    backgroundColor: isActive ? '#1B8A4C' : '#EFEFEF',
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: '700',
-                      color: isActive ? '#FFFFFF' : '#555555',
-                    }}
-                  >
-                    {cat}
-                  </Text>
+              <TouchableOpacity key={cat} onPress={() => setActiveCategory(cat)} activeOpacity={0.8}>
+                <View style={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 9,
+                  borderRadius: 22,
+                  marginRight: 8,
+                  backgroundColor: isActive ? '#1B8A4C' : '#F0F0F0',
+                }}>
+                  <Text style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    color: isActive ? '#fff' : '#555',
+                  }}>{cat}</Text>
                 </View>
               </TouchableOpacity>
             );
@@ -93,55 +90,71 @@ export default function ExploreScreen({ navigation, route }) {
         </ScrollView>
       </View>
 
-      {/* Results */}
+      {/* Campaign list */}
       {filtered.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={{ fontSize: 46, marginBottom: 12 }}>🔍</Text>
+          <Text style={{ fontSize: 44, marginBottom: 12 }}>🔍</Text>
           <Text style={styles.emptyTitle}>No campaigns found</Text>
-          <Text style={styles.emptyDesc}>Try a different search or category</Text>
-          <TouchableOpacity
-            onPress={() => { setSearch(''); setActiveCategory('All'); }}
-            style={styles.clearBtn}
-          >
+          <TouchableOpacity onPress={() => { setSearch(''); setActiveCategory('All'); }} style={styles.clearBtn}>
             <Text style={styles.clearBtnText}>Clear filters</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
-          <Text style={styles.resultCount}>{filtered.length} campaign{filtered.length !== 1 ? 's' : ''} found</Text>
           {filtered.map((c) => (
             <TouchableOpacity
               key={c.id}
               style={styles.card}
+              activeOpacity={0.95}
               onPress={() => navigation.navigate('Campaign', { campaign: c })}
             >
-              <View style={styles.cardImgBox}>
+              {/* Image + priority badge */}
+              <View style={styles.imgBox}>
                 <Image source={c.image} style={styles.cardImg} />
-                <View style={[styles.tagBadge, { backgroundColor: c.tagColor }]}>
-                  <Text style={styles.tagText}>{c.tag}</Text>
+                <View style={[styles.priorityBadge, { backgroundColor: c.tagColor }]}>
+                  <Text style={styles.priorityText}>{c.tag === 'URGENT' ? 'HIGH PRIORITY' : c.tag}</Text>
                 </View>
               </View>
+
+              {/* Card body */}
               <View style={styles.cardBody}>
+                {/* Category · Location */}
+                <View style={styles.metaRow}>
+                  <Text style={[styles.categoryText, { color: c.tagColor }]}>{c.category.toUpperCase()}</Text>
+                  <Text style={styles.metaDot}> · </Text>
+                  <Text style={styles.locationText}>{LOCATION_MAP[c.id] || 'India'}</Text>
+                </View>
+
+                {/* Title */}
                 <Text style={styles.cardTitle}>{c.title}</Text>
-                <Text style={styles.cardDesc} numberOfLines={2}>{c.desc}</Text>
+
+                {/* Description */}
+                <Text style={styles.cardDesc} numberOfLines={3}>{c.desc}</Text>
+
+                {/* % Raised + Goal on same line */}
+                <View style={styles.pctRow}>
+                  <Text style={styles.pctText}><Text style={styles.pctNum}>{c.percent}%</Text> Raised</Text>
+                  <Text style={styles.goalText}>Goal: ₹{(c.goal / 100000).toFixed(0)}L</Text>
+                </View>
+
+                {/* Progress bar */}
                 <View style={styles.progressBg}>
                   <View style={[styles.progressFill, { width: `${c.percent}%` }]} />
                 </View>
-                <View style={styles.cardStats}>
+
+                {/* AMOUNT RAISED + Donate Now button */}
+                <View style={styles.bottomRow}>
                   <View>
-                    <Text style={styles.raised}>₹{(c.raised / 1000).toFixed(0)}k raised</Text>
-                    <Text style={styles.goal}>of ₹{(c.goal / 1000).toFixed(0)}k goal</Text>
+                    <Text style={styles.amountLabel}>AMOUNT RAISED</Text>
+                    <Text style={styles.amountValue}>₹{(c.raised / 100000).toFixed(1)}L</Text>
                   </View>
-                  <View style={styles.pctBadge}>
-                    <Text style={styles.pctText}>{c.percent}%</Text>
-                  </View>
+                  <TouchableOpacity
+                    style={styles.donateBtn}
+                    onPress={() => navigation.navigate('Donation', { campaign: c })}
+                  >
+                    <Text style={styles.donateBtnText}>Donate Now</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  style={styles.donateBtn}
-                  onPress={() => navigation.navigate('Donation', { campaign: c })}
-                >
-                  <Text style={styles.donateBtnText}>Donate Now</Text>
-                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           ))}
@@ -153,35 +166,48 @@ export default function ExploreScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  header: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: '#1A1A1A' },
-  searchWrap: { backgroundColor: '#fff', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8 },
-  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: '#EBEBEB' },
+  searchWrap: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10 },
+  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 11, borderWidth: 1, borderColor: '#EBEBEB' },
   searchInput: { flex: 1, fontSize: 14, color: '#333' },
-  catRow: { backgroundColor: '#fff', paddingBottom: 10 },
-  catContent: { paddingHorizontal: 16, paddingTop: 4 },
-  list: { paddingHorizontal: 16, paddingTop: 10 },
-  resultCount: { fontSize: 12, color: '#999', marginBottom: 10 },
-  card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 6, elevation: 3 },
-  cardImgBox: { width: '100%', height: 170 },
+
+  catWrap: { backgroundColor: '#fff', paddingBottom: 12 },
+  catContent: { paddingHorizontal: 16, paddingTop: 4, gap: 0 },
+
+  list: { paddingHorizontal: 16, paddingTop: 12 },
+
+  card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 8, elevation: 3 },
+
+  imgBox: { width: '100%', height: 200, position: 'relative' },
   cardImg: { width: '100%', height: '100%', resizeMode: 'cover' },
-  tagBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
-  tagText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
-  cardBody: { padding: 14 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A', marginBottom: 5 },
-  cardDesc: { fontSize: 12, color: '#777', marginBottom: 12, lineHeight: 18 },
-  progressBg: { height: 7, backgroundColor: '#E8F5E9', borderRadius: 4, marginBottom: 10 },
+  priorityBadge: { position: 'absolute', top: 14, left: 14, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 6 },
+  priorityText: { color: '#fff', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+
+  cardBody: { padding: 16 },
+
+  metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  categoryText: { fontSize: 12, fontWeight: '800', letterSpacing: 0.3 },
+  metaDot: { fontSize: 12, color: '#bbb' },
+  locationText: { fontSize: 12, color: '#888', fontWeight: '500' },
+
+  cardTitle: { fontSize: 20, fontWeight: '800', color: '#1A1A1A', marginBottom: 8, lineHeight: 26 },
+  cardDesc: { fontSize: 13, color: '#666', lineHeight: 20, marginBottom: 14 },
+
+  pctRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  pctText: { fontSize: 14, color: '#555' },
+  pctNum: { fontSize: 16, fontWeight: '800', color: '#1B8A4C' },
+  goalText: { fontSize: 13, color: '#999' },
+
+  progressBg: { height: 7, backgroundColor: '#E8F5E9', borderRadius: 4, marginBottom: 14 },
   progressFill: { height: 7, backgroundColor: '#1B8A4C', borderRadius: 4 },
-  cardStats: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  raised: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
-  goal: { fontSize: 11, color: '#999', marginTop: 1 },
-  pctBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 },
-  pctText: { fontSize: 14, color: '#1B8A4C', fontWeight: '800' },
-  donateBtn: { backgroundColor: '#1B8A4C', paddingVertical: 13, borderRadius: 11, alignItems: 'center' },
+
+  bottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  amountLabel: { fontSize: 10, fontWeight: '700', color: '#aaa', letterSpacing: 0.8, marginBottom: 3 },
+  amountValue: { fontSize: 20, fontWeight: '800', color: '#1A1A1A' },
+  donateBtn: { backgroundColor: '#1B8A4C', paddingHorizontal: 24, paddingVertical: 13, borderRadius: 10 },
   donateBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 6 },
-  emptyDesc: { fontSize: 13, color: '#999', marginBottom: 20, textAlign: 'center' },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 16 },
   clearBtn: { backgroundColor: '#1B8A4C', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 },
   clearBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 });
