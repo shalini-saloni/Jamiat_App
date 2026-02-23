@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CAMPAIGNS } from './HomeScreen';
 
-const CATEGORIES = ['All', 'Relief', 'Education', 'Health', 'Zakat', 'Food'];
+const CATEGORIES = ['All', 'Food', 'Water', 'Health', 'Education', 'Zakat'];
 
 export default function ExploreScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -57,7 +57,7 @@ export default function ExploreScreen({ navigation, route }) {
         </View>
       </View>
 
-      {/* Category pills */}
+      {/* Category pills - key fix: use inline backgroundColor directly on View */}
       <View style={styles.catRow}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catContent}>
           {CATEGORIES.map((cat) => {
