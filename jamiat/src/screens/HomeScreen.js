@@ -101,6 +101,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* ── Green Header ───────────────────────────────────────── */}
       <View style={styles.header}>
         {/* Logo row */}
         <View style={styles.logoRow}>
@@ -204,10 +205,8 @@ export default function HomeScreen({ navigation }) {
                     <View style={[styles.progressFill, { width: `${c.percent}%` }]} />
                   </View>
                   <View style={styles.raisedRow}>
-                    <View>
-                      <Text style={styles.raisedLabel}>Raised: <Text style={styles.raisedAmt}>₹{(c.raised/100000).toFixed(1)}L</Text></Text>
-                      <Text style={styles.goalLabel}>Goal: ₹{(c.goal/100000).toFixed(0)}L</Text>
-                    </View>
+                    <Text style={styles.raisedLabel}>Raised: <Text style={styles.raisedAmt}>₹{(c.raised/100000).toFixed(1)}L</Text></Text>
+                    <Text style={styles.goalLabel}>Goal: ₹{(c.goal/100000).toFixed(0)}L</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.donateNowBtn}
@@ -340,7 +339,7 @@ const styles = StyleSheet.create({
   campaignTitle: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', marginBottom: 8 },
   progressBg: { height: 5, backgroundColor: '#E8F5E9', borderRadius: 3, marginBottom: 8 },
   progressFill: { height: 5, backgroundColor: '#1B8A4C', borderRadius: 3 },
-  raisedRow: { marginBottom: 10 },
+  raisedRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   raisedLabel: { fontSize: 12, color: '#555' },
   raisedAmt: { fontWeight: '700', color: '#1A1A1A' },
   goalLabel: { fontSize: 11, color: '#999', marginTop: 1 },
