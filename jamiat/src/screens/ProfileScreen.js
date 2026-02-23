@@ -30,6 +30,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Profile</Text>
         <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
@@ -38,6 +39,7 @@ export default function ProfileScreen({ navigation }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Profile Card */}
         <LinearGradient colors={['#1B8A4C', '#0D5C30']} style={styles.profileCard}>
           <View style={styles.avatarWrap}>
             <View style={styles.avatar}>
@@ -53,6 +55,7 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </LinearGradient>
 
+        {/* Stats Row */}
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Text style={styles.statNum}>₹{totalImpact.toLocaleString()}</Text>
@@ -70,10 +73,11 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
+        {/* Donation History */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Donation History</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('MyImpact')}>
+            <TouchableOpacity onPress={() => navigation.navigate('OurImpact')}>
               <Text style={styles.seeAll}>View Impact ›</Text>
             </TouchableOpacity>
           </View>
@@ -104,6 +108,7 @@ export default function ProfileScreen({ navigation }) {
           )}
         </View>
 
+        {/* 80G Tax */}
         {totalImpact > 0 && (
           <View style={styles.taxCard}>
             <View style={styles.taxIcon}>
@@ -123,11 +128,12 @@ export default function ProfileScreen({ navigation }) {
           </View>
         )}
 
+        {/* Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
           {[
             { icon: 'person-outline', label: 'Edit Profile', onPress: () => navigation.navigate('EditProfile') },
-            { icon: 'bar-chart-outline', label: 'Impact Dashboard', onPress: () => navigation.navigate('MyImpact') },
+            { icon: 'bar-chart-outline', label: 'Impact Dashboard', onPress: () => navigation.navigate('OurImpact') },
             { icon: 'notifications-outline', label: 'Notification Preferences', onPress: () => {} },
             { icon: 'lock-closed-outline', label: 'Security & App PIN', onPress: () => {} },
             { icon: 'help-circle-outline', label: 'Help & Support', onPress: () => {} },
@@ -142,6 +148,7 @@ export default function ProfileScreen({ navigation }) {
           ))}
         </View>
 
+        {/* Sign Out */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={18} color="#E53935" />
           <Text style={styles.logoutText}>Sign Out</Text>
