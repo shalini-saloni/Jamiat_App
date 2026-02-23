@@ -35,7 +35,8 @@ export default function DonationScreen({ navigation, route }) {
   const initType  = route?.params?.donationType || 'Zakat';
   const initFreq  = route?.params?.frequency    || 'One-Time';
 
-  const [selectedProject,  setSelectedProject]  = useState(campaign || CAMPAIGNS[0]);
+  const [selectedProject,  setSelectedProject]  = useState(campaign || null);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [selectedType,     setSelectedType]     = useState(initType);
   const [dedicate,         setDedicate]         = useState('For Myself');
   const [frequency,        setFrequency]        = useState(initFreq);
@@ -48,7 +49,7 @@ export default function DonationScreen({ navigation, route }) {
   const [finalAmount,      setFinalAmount]      = useState(0);
 
   const currentAmount = customAmount ? (parseInt(customAmount) || 0) : selectedAmount;
-  const totalContribution = currentAmount; 
+  const totalContribution = currentAmount; // processing fee = 0
 
   const handleProceed = () => {
     if (currentAmount < 50) {
@@ -147,14 +148,44 @@ export default function DonationScreen({ navigation, route }) {
 
       <ScrollView showsVerticalScrollIndicator={false}>
 
-        {/* Selected Project dropdown */}
+        {/* Selected Project - full picker */}
         <View style={styles.card}>
           <Text style={styles.cardLabel}>SELECTED PROJECT</Text>
-          <TouchableOpacity style={styles.projectDropdown}>
-            <View style={styles.projectDotGreen} />
-            <Text style={styles.projectDropdownText} numberOfLines={1}>{selectedProject?.title || 'Select Project'}</Text>
-            <Ionicons name="chevron-down" size={16} color="#aaa" />
+          <TouchableOpacity style={styles.projectDropdown} onPress={() => setShowProjectPicker(!showProjectPicker)}>
+            {selectedProject ? (
+              <>
+                <View style={[styles.projectDotGreen, { backgroundColor: selectedProject.tagColor }]} />
+                <Text style={styles.projectDropdownText} numberOfLines={1}>{selectedProject.title}</Text>
+              </>
+            ) : (
+              <>
+                <View style={styles.projectDotGreen} />
+                <Text style={[styles.projectDropdownText, { color: '#bbb' }]}>Select a project...</Text>
+              </>
+            )}
+            <Ionicons name={showProjectPicker ? 'chevron-up' : 'chevron-down'} size={16} color="#aaa" />
           </TouchableOpacity>
+
+          {showProjectPicker && (
+            <View style={styles.pickerList}>
+              {CAMPAIGNS.map((c) => (
+                <TouchableOpacity
+                  key={c.id}
+                  style={[styles.pickerItem, selectedProject?.id === c.id && styles.pickerItemActive]}
+                  onPress={() => { setSelectedProject(c); setShowProjectPicker(false); }}
+                >
+                  <View style={[styles.pickerDot, { backgroundColor: c.tagColor }]} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.pickerTitle, selectedProject?.id === c.id && { color: '#1B8A4C' }]}>{c.title}</Text>
+                    <Text style={styles.pickerMeta}>{c.tag} · ₹{(c.raised/100000).toFixed(1)}L raised</Text>
+                  </View>
+                  {selectedProject?.id === c.id && (
+                    <Ionicons name="checkmark-circle" size={18} color="#1B8A4C" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Donation Type 2×2 */}
@@ -363,6 +394,12 @@ const styles = StyleSheet.create({
   projectDropdown: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 10, padding: 12 },
   projectDotGreen: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#1B8A4C', marginRight: 10 },
   projectDropdownText: { flex: 1, fontSize: 14, fontWeight: '600', color: '#1A1A1A' },
+  pickerList: { marginTop: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 8 },
+  pickerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 4, borderRadius: 10, gap: 10 },
+  pickerItemActive: { backgroundColor: '#F0FFF4' },
+  pickerDot: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
+  pickerTitle: { fontSize: 13, fontWeight: '600', color: '#1A1A1A', marginBottom: 2 },
+  pickerMeta: { fontSize: 11, color: '#aaa' },
 
   // Type 2×2
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
