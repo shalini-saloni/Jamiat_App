@@ -101,7 +101,6 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* ── Green Header ───────────────────────────────────────── */}
       <View style={styles.header}>
         {/* Logo row */}
         <View style={styles.logoRow}>
