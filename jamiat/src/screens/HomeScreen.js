@@ -80,10 +80,10 @@ export const IMPACT_STORIES = [
 ];
 
 const QUICK_DONATIONS = [
-  { icon: 'mosque', label: 'Zakat' },
-  { icon: 'hand-holding-heart', label: 'Sadaqa' },
-  { icon: 'globe', label: 'General' },
-  { icon: 'hands-helping', label: 'Relief' },
+  { icon: 'mosque',             label: 'Zakat',    type: 'Zakat' },
+  { icon: 'hand-holding-heart', label: 'Sadaqa',   type: 'Sadaqa' },
+  { icon: 'globe',              label: 'General',  type: 'General' },
+  { icon: 'chart-line',         label: 'Interest', type: 'Interest' },
 ];
 
 export default function HomeScreen({ navigation }) {
@@ -138,7 +138,7 @@ export default function HomeScreen({ navigation }) {
               placeholderTextColor="#aaa"
               value={search}
               onChangeText={setSearch}
-              onSubmitEditing={() => { if (search.trim()) navigation.navigate('Explore', { searchQuery: search }); }}
+              onSubmitEditing={() => { if (search.trim()) navigation.navigate('Project', { searchQuery: search }); }}
               returnKeyType="search"
             />
             {search.length > 0 && (
@@ -149,11 +149,11 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Urgent Relief */}
+        {/* Urgent Campaigns */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Urgent Relief</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Explore')}>
+            <Text style={styles.sectionTitle}>Urgent Campaigns</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Project')}>
               <Text style={styles.viewAll}>View All</Text>
             </TouchableOpacity>
           </View>
@@ -195,14 +195,28 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.sectionTitle}>Quick Donation</Text>
           <View style={styles.quickGrid}>
             {QUICK_DONATIONS.map((q) => (
-              <TouchableOpacity key={q.label} style={styles.quickItem} onPress={() => navigation.navigate('Donation', { donationType: q.label })}>
+              <TouchableOpacity key={q.label} style={styles.quickItem} onPress={() => navigation.navigate('Donation', { donationType: q.type })}>
                 <View style={styles.quickIcon}>
-                  <FontAwesome5 name={q.icon} size={22} color="#1B8A4C" />
+                  <FontAwesome5 name={q.icon} size={20} color="#1B8A4C" />
                 </View>
                 <Text style={styles.quickLabel}>{q.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Start Your Daily Giving Banner */}
+        <View style={styles.sectionPad}>
+          <TouchableOpacity style={styles.dailyGivingBanner} onPress={() => navigation.navigate('Donation', { donationType: 'Sadaqa', frequency: 'Daily' })}>
+            <View style={styles.dailyGivingLeft}>
+              <Text style={styles.dailyGivingTitle}>Start Your Daily Giving</Text>
+              <Text style={styles.dailyGivingSubtitle}>Just ₹10/day • Change a life forever</Text>
+              <View style={styles.dailyGivingBtn}>
+                <Text style={styles.dailyGivingBtnText}>Set Up Now</Text>
+              </View>
+            </View>
+            <Text style={{ fontSize: 44 }}>🌱</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Recent Impact */}
@@ -250,6 +264,13 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
   searchInput: { flex: 1, fontSize: 13, color: '#333' },
   section: { paddingHorizontal: 16, marginBottom: 22 },
+  sectionPad: { paddingHorizontal: 16, marginBottom: 22 },
+  dailyGivingBanner: { backgroundColor: '#F5A623', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  dailyGivingLeft: { flex: 1 },
+  dailyGivingTitle: { color: '#fff', fontSize: 17, fontWeight: '800', marginBottom: 4 },
+  dailyGivingSubtitle: { color: 'rgba(255,255,255,0.85)', fontSize: 12, marginBottom: 12 },
+  dailyGivingBtn: { backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, alignSelf: 'flex-start' },
+  dailyGivingBtnText: { color: '#F5A623', fontWeight: '800', fontSize: 12 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   sectionTitle: { fontSize: 17, fontWeight: '700', color: '#1A1A1A' },
   viewAll: { color: '#1B8A4C', fontSize: 13, fontWeight: '600' },
