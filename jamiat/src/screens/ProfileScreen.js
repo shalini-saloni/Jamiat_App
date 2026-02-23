@@ -87,7 +87,7 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.emptyText}>No donations yet</Text>
               <TouchableOpacity
                 style={styles.donateNowBtn}
-                onPress={() => navigation.navigate('Donation')}
+                onPress={() => navigation.navigate('Donate')}
               >
                 <Text style={styles.donateNowText}>Make Your First Donation</Text>
               </TouchableOpacity>
