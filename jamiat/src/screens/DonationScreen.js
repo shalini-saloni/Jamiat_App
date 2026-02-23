@@ -57,11 +57,9 @@ export default function DonationScreen({ navigation, route }) {
     }, 1400);
   };
 
-  // Navigate safely back to tabs after donation
   const goHome = () => {
-    // Works whether Donation was opened as a tab or pushed from a stack
     if (navigation.canGoBack()) {
-      navigation.popToTop(); // go back to Tabs
+      navigation.popToTop(); 
     } else {
       navigation.navigate('Tabs');
     }
@@ -74,7 +72,6 @@ export default function DonationScreen({ navigation, route }) {
     navigation.navigate('MyImpact');
   };
 
-  // ─── SUCCESS SCREEN ───────────────────────────────────────────────────────
   if (success) {
     return (
       <View style={[styles.successBg, { paddingTop: insets.top }]}>
@@ -98,7 +95,6 @@ export default function DonationScreen({ navigation, route }) {
     );
   }
 
-  // ─── DONATION FORM ────────────────────────────────────────────────────────
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}

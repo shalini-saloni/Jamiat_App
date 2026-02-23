@@ -57,7 +57,6 @@ export default function ExploreScreen({ navigation, route }) {
         </View>
       </View>
 
-      {/* Category pills - key fix: use inline backgroundColor directly on View */}
       <View style={styles.catRow}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catContent}>
           {CATEGORIES.map((cat) => {

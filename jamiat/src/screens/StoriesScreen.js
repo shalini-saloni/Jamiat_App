@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IMPACT_STORIES } from './HomeScreen';
@@ -21,8 +21,9 @@ export default function StoriesScreen({ navigation }) {
         <Text style={styles.subtitle}>See how your donations are changing lives around the world</Text>
         {IMPACT_STORIES.map((story) => (
           <TouchableOpacity key={story.id} style={styles.card} onPress={() => navigation.navigate('Story', { story })}>
-            <View style={[styles.cardImage, { backgroundColor: story.color }]}>
-              <Text style={{ fontSize: 56 }}>{story.emoji}</Text>
+
+            <View style={styles.cardImageBox}>
+              <Image source={story.image} style={styles.cardImage} />
               <View style={styles.categoryBadge}>
                 <Text style={styles.categoryText}>{story.category}</Text>
               </View>
@@ -64,8 +65,9 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
   subtitle: { fontSize: 13, color: '#888', marginBottom: 16, lineHeight: 18 },
   card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 18, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 6, elevation: 3 },
-  cardImage: { height: 170, alignItems: 'center', justifyContent: 'center' },
-  categoryBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.35)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
+  cardImageBox: { width: '100%', height: 180 },
+  cardImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  categoryBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
   categoryText: { color: '#fff', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
   cardBody: { padding: 16 },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },

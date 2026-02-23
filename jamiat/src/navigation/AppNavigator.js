@@ -56,7 +56,7 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen name="Home"     component={HomeScreen}    options={{ tabBarLabel: 'Home' }} />
-      <Tab.Screen name="Explore"  component={ExploreScreen} options={{ tabBarLabel: 'Explore' }} />
+      <Tab.Screen name="Explore"  component={ExploreScreen} options={{ tabBarLabel: 'Campaigns' }} />
       <Tab.Screen name="MyImpact" component={ImpactScreen}  options={{ tabBarLabel: 'My Impact' }} />
       <Tab.Screen name="Profile"  component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>

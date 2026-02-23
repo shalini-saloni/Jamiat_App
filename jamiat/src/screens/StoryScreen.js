@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,10 +20,11 @@ export default function StoryScreen({ navigation, route }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero */}
-        <View style={[styles.hero, { backgroundColor: story.color || '#1B6B3A' }]}>
-          <Text style={styles.heroEmoji}>{story.emoji || '🌟'}</Text>
-        </View>
+        {story.image ? (
+          <Image source={story.image} style={styles.heroImage} />
+        ) : (
+          <View style={[styles.heroFallback, { backgroundColor: story.color || '#1B6B3A' }]} />
+        )}
 
         <View style={styles.content}>
           <View style={styles.meta}>
@@ -34,14 +35,15 @@ export default function StoryScreen({ navigation, route }) {
           </View>
 
           <Text style={styles.title}>{story.title}</Text>
-          <Text style={styles.date}>{story.date || 'Published recently'}</Text>
-
+          <Text style={styles.date}>{story.date || ''}</Text>
           <Text style={styles.body}>{story.fullStory || story.desc}</Text>
 
           {story.quote && (
             <View style={styles.quoteBox}>
               <Text style={styles.quoteText}>"{story.quote}"</Text>
-              {story.quotePerson && <Text style={styles.quotePerson}>— {story.quotePerson}</Text>}
+              {story.quotePerson && (
+                <Text style={styles.quotePerson}>— {story.quotePerson}</Text>
+              )}
             </View>
           )}
 
@@ -75,8 +77,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   backBtn: { width: 36 },
   headerTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
-  hero: { height: 220, alignItems: 'center', justifyContent: 'center' },
-  heroEmoji: { fontSize: 80 },
+  heroImage: { width: '100%', height: 240, resizeMode: 'cover' },
+  heroFallback: { width: '100%', height: 240 },
   content: { padding: 20 },
   meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   categoryBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
@@ -91,7 +93,7 @@ const styles = StyleSheet.create({
   impactBox: { backgroundColor: '#F9F9F9', borderRadius: 12, padding: 16, marginBottom: 20 },
   impactTitle: { fontSize: 15, fontWeight: '700', color: '#1A1A1A', marginBottom: 12 },
   impactRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  impactNum: { fontSize: 22, fontWeight: '800', color: '#1B8A4C', width: 80 },
+  impactNum: { fontSize: 22, fontWeight: '800', color: '#1B8A4C', width: 90 },
   impactLabel: { fontSize: 13, color: '#555', flex: 1 },
   footer: { paddingHorizontal: 16, paddingTop: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F0F0F0' },
   donateBtn: { backgroundColor: '#1B8A4C', paddingVertical: 15, borderRadius: 13, alignItems: 'center' },

@@ -135,7 +135,7 @@ export default function CampaignScreen({ navigation, route }) {
       {/* Donate Footer */}
       <View style={[styles.donateFooter, { paddingBottom: insets.bottom + 12 }]}>
         <TouchableOpacity style={styles.donateBtn} onPress={() => navigation.navigate('Donation', { campaign })}>
-          <Text style={styles.donateBtnText}>Donate Now ♥</Text>
+          <Text style={styles.donateBtnText}>Donate Now</Text>
         </TouchableOpacity>
       </View>
     </View>
