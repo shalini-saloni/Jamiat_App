@@ -34,7 +34,7 @@ export default function ExploreScreen({ navigation, route }) {
     <View style={{ flex: 1, backgroundColor: '#F5F5F5', paddingTop: insets.top }}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Explore Campaigns</Text>
+        <Text style={styles.headerTitle}>Projects</Text>
       </View>
 
       {/* Search bar */}
@@ -57,6 +57,7 @@ export default function ExploreScreen({ navigation, route }) {
         </View>
       </View>
 
+      {/* Category pills */}
       <View style={styles.catRow}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catContent}>
           {CATEGORIES.map((cat) => {
